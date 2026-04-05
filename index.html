@@ -1,507 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LotusFx — Intraday Aerial View</title>
-<style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { background:#0d0f14; color:#e0e0e0; font-family:'Segoe UI',sans-serif; font-size:13px; }
-
-#topbar { background:#141720; border-bottom:1px solid #222636; padding:6px 16px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-.title { font-size:13px; font-weight:700; color:#7c9fff; margin-right:10px; letter-spacing:.5px; }
-.pulse-chip { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; }
-.pulse-chip::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; display:inline-block; }
-.bull  { background:#0d2e1a; color:#34d399; border:1px solid #1a5c38; }
-.bear  { background:#2e0d0d; color:#f87171; border:1px solid #5c1a1a; }
-.neut  { background:#1e1e2e; color:#94a3b8; border:1px solid #334155; }
-.warn  { background:#2e1f0d; color:#fbbf24; border:1px solid #78460d; }
-#clock { margin-left:auto; font-size:12px; color:#64748b; font-variant-numeric:tabular-nums; }
-
-.section-label { font-size:10px; font-weight:700; letter-spacing:1.2px; color:#475569; padding:8px 14px 3px; text-transform:uppercase; }
-
-.tier1-row { display:flex; gap:8px; padding:4px 12px; }
-.tier1-card { flex:1; height:220px; background:#141720; border:1px solid #1e2436; border-radius:8px; overflow:hidden; display:flex; flex-direction:column; }
-.card-header { padding:5px 10px; background:#1a1f2e; border-bottom:1px solid #1e2436; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
-.card-header .name { font-size:12px; font-weight:600; color:#cbd5e1; }
-.card-header .meta { font-size:10px; color:#475569; }
-.card-body { flex:1; overflow:hidden; }
-
-.tier2-scroll { display:flex; gap:8px; padding:4px 12px 6px; overflow-x:auto; scrollbar-width:thin; scrollbar-color:#2a3040 transparent; }
-.spark-card { flex-shrink:0; width:190px; height:110px; background:#141720; border:1px solid #1e2436; border-radius:8px; overflow:hidden; display:flex; flex-direction:column; }
-.spark-card .card-header { padding:4px 8px; }
-.spark-body { flex:1; overflow:hidden; }
-
-.tier3-scroll { display:flex; gap:8px; padding:4px 12px 6px; flex-wrap:wrap; }
-.stock-card { width:170px; height:130px; background:#141720; border:1px solid #1e2436; border-radius:8px; overflow:hidden; display:flex; flex-direction:column; }
-.stock-card .card-header { padding:4px 8px; }
-
-.scanner-bar { display:flex; gap:8px; padding:4px 12px; flex-wrap:wrap; }
-.signal-chip { background:#141720; border:1px solid #1e2436; border-radius:8px; padding:7px 12px; flex:1; min-width:110px; }
-.signal-chip .sig-label { font-size:10px; color:#475569; font-weight:700; letter-spacing:.6px; text-transform:uppercase; }
-.signal-chip .sig-stocks { font-size:11px; color:#94a3b8; margin-top:2px; }
-.signal-chip.active-sig { border-color:#1a5c38; }
-.signal-chip.active-sig .sig-label { color:#34d399; }
-.signal-chip.active-sig .sig-stocks { color:#6ee7b7; }
-
-.matrix-wrap { padding:4px 12px 8px; overflow-x:auto; }
-.matrix-table { border-collapse:collapse; background:#141720; border:1px solid #1e2436; border-radius:8px; overflow:hidden; min-width:900px; }
-.matrix-table th { background:#1a1f2e; padding:6px 10px; font-size:10px; font-weight:700; letter-spacing:.8px; color:#475569; text-transform:uppercase; text-align:center; white-space:nowrap; }
-.matrix-table th:first-child { text-align:left; width:90px; }
-.matrix-table td { padding:3px 8px; text-align:center; border-top:1px solid #1a1f2e; font-size:11px; vertical-align:middle; }
-.matrix-table td:first-child { text-align:left; font-weight:600; color:#cbd5e1; }
-.matrix-table tr:hover td { background:#1a1f2e; }
-.badge { display:inline-block; padding:2px 7px; border-radius:10px; font-size:10px; font-weight:700; }
-.b-bull  { background:#0d2e1a; color:#34d399; }
-.b-bear  { background:#2e0d0d; color:#f87171; }
-.b-neut  { background:#1e2030; color:#94a3b8; }
-.b-warn  { background:#2e1f0d; color:#fbbf24; }
-.b-trade { background:#0a3020; color:#10b981; border:1px solid #065f46; }
-.b-watch { background:#2c1e08; color:#f59e0b; border:1px solid #92400e; }
-.b-skip  { background:#2c0a0a; color:#ef4444; border:1px solid #991b1b; }
-
-#footer { text-align:center; padding:8px; font-size:10px; color:#334155; border-top:1px solid #1a1f2e; margin-top:4px; }
-::-webkit-scrollbar { height:4px; width:4px; }
-::-webkit-scrollbar-thumb { background:#2a3040; border-radius:4px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LotusFx - MTF Confirmation Matrix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        body { background-color: #0d1117; color: #c9d1d9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .matrix-table { width: 100%; border-collapse: collapse; }
+        .matrix-table th { color: #8b949e; text-transform: uppercase; font-size: 0.75rem; padding: 16px; text-align: left; border-bottom: 1px solid #30363d; background: #161b22; }
+        .matrix-table td { padding: 12px 16px; border-bottom: 1px solid #21262d; vertical-align: middle; background: #0d1117; }
+        
+        /* కస్టమ్ బ్యాడ్జ్ స్టైల్స్ */
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-align: center; display: inline-block; }
+        
+        .badge-bull { background: rgba(46, 160, 67, 0.15); color: #3fb950; }
+        .badge-bear { background: rgba(248, 81, 73, 0.15); color: #ff7b72; }
+        .badge-flat { background: rgba(210, 153, 34, 0.15); color: #e3b341; }
+        .badge-neut { background: rgba(139, 148, 158, 0.15); color: #8b949e; }
+        
+        .action-trade { border: 1px solid #3fb950; color: #3fb950; background: transparent; border-radius: 20px; padding: 4px 12px;}
+        .action-watch { border: 1px solid #e3b341; color: #e3b341; background: transparent; border-radius: 20px; padding: 4px 12px;}
+        .action-skip { border: 1px solid #ff7b72; color: #ff7b72; background: transparent; border-radius: 20px; padding: 4px 12px;}
+    </style>
 </head>
-<body>
+<body class="p-8">
 
-<div id="topbar">
-  <span class="title">&#9670; LOTUSFX — INTRADAY AERIAL VIEW</span>
-  <span class="pulse-chip bull">NIFTY BULL</span>
-  <span class="pulse-chip bull">BANK NIFTY BULL</span>
-  <span class="pulse-chip warn">VIX 14.2</span>
-  <span class="pulse-chip neut">PCR 0.92</span>
-  <span class="pulse-chip neut" id="breadth-chip">BREADTH 61%</span>
-  <span id="clock">--:--:--</span>
-</div>
-
-<!-- TIER 1 -->
-<div class="section-label">Tier 1 — Nifty Indexes (Market Direction · H1)</div>
-<div class="tier1-row">
-
-  <div class="tier1-card">
-    <div class="card-header"><span class="name">Nifty 50</span><span class="meta">CAPITALCOM:IN50 · H1</span></div>
-    <div class="card-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-        {"symbol":"CAPITALCOM:IN50","interval":"60","timezone":"Asia/Kolkata","theme":"dark","style":"1","locale":"en","toolbar_bg":"#141720","enable_publishing":false,"withdateranges":false,"hide_side_toolbar":true,"allow_symbol_change":false,"save_image":false,"studies":["MAExp@tv-basicstudies","Volume@tv-basicstudies"],"height":"100%","width":"100%"}
-        </script>
-      </div>
+    <div class="max-w-6xl mx-auto border border-gray-800 rounded-lg overflow-hidden shadow-lg">
+        <table class="matrix-table">
+            <thead>
+                <tr>
+                    <th>Stock</th>
+                    <th style="width: 200px;">Intraday Chart</th>
+                    <th>D1</th>
+                    <th>H1</th>
+                    <th>15M</th>
+                    <th>5M</th>
+                    <th>Signal</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                </tbody>
+        </table>
     </div>
-  </div>
 
-  <div class="tier1-card">
-    <div class="card-header"><span class="name">Bank Nifty</span><span class="meta">BSE:BANKEX · H1</span></div>
-    <div class="card-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-        {"symbol":"BSE:BANKEX","interval":"60","timezone":"Asia/Kolkata","theme":"dark","style":"1","locale":"en","toolbar_bg":"#141720","enable_publishing":false,"withdateranges":false,"hide_side_toolbar":true,"allow_symbol_change":false,"save_image":false,"studies":["MAExp@tv-basicstudies","Volume@tv-basicstudies"],"height":"100%","width":"100%"}
-        </script>
-      </div>
-    </div>
-  </div>
+    <script>
+        // 1. డాటా (ఇది మీ API నుండి వచ్చే డాటా అనుకోండి)
+        // sparkData లో ఉన్న నంబర్స్ ఇంట్రాడే ప్రైస్ మూమెంట్స్ ని సూచిస్తాయి
+        const stocksData = [
+            { id: 'TCS', name: 'TCS', sparkData: [3500, 3510, 3490, 3520, 3540, 3530, 3560], d1: 'Bull', h1: 'Bull', m15: 'BO', m5: 'Flat', signal: 'Breakout', action: 'TRADE' },
+            { id: 'INFY', name: 'INFY', sparkData: [1400, 1410, 1430, 1420, 1450, 1460, 1480], d1: 'Bull', h1: 'Bull', m15: 'Mom', m5: 'Bull', signal: 'Momentum', action: 'TRADE' },
+            { id: 'HDFCBANK', name: 'HDFCBANK', sparkData: [1600, 1590, 1610, 1605, 1620, 1615, 1630], d1: 'Bull', h1: 'Chop', m15: 'Vol', m5: 'Mom', signal: 'Vol Spike', action: 'WATCH' },
+            { id: 'ICICIBANK', name: 'ICICIBANK', sparkData: [1050, 1045, 1055, 1050, 1048, 1052, 1050], d1: 'Bull', h1: 'Bull', m15: 'Flat', m5: 'Neut', signal: 'Wait', action: 'WATCH' },
+            { id: 'MARUTI', name: 'MARUTI', sparkData: [10200, 10150, 10100, 10050, 10080, 10000, 9950], d1: 'Bear', h1: 'Bear', m15: 'Flat', m5: 'Weak', signal: 'No setup', action: 'SKIP' }
+        ];
 
-  <div class="tier1-card">
-    <div class="card-header"><span class="name">Sensex</span><span class="meta">BSE:SENSEX · H1</span></div>
-    <div class="card-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-        {"symbol":"BSE:SENSEX","interval":"60","timezone":"Asia/Kolkata","theme":"dark","style":"1","locale":"en","toolbar_bg":"#141720","enable_publishing":false,"withdateranges":false,"hide_side_toolbar":true,"allow_symbol_change":false,"save_image":false,"studies":["MAExp@tv-basicstudies"],"height":"100%","width":"100%"}
-        </script>
-      </div>
-    </div>
-  </div>
+        // బ్యాడ్జ్ కలర్స్ కోసం హెల్పర్ ఫంక్షన్స్
+        function getBadgeClass(val) {
+            if(['Bull', 'BO', 'Mom', 'Breakout', 'Momentum'].includes(val)) return 'badge-bull';
+            if(['Bear', 'Weak', 'No setup'].includes(val)) return 'badge-bear';
+            if(['Chop', 'Flat', 'Vol', 'Vol Spike', 'Wait'].includes(val)) return 'badge-flat';
+            return 'badge-neut';
+        }
 
-</div>
+        function getActionClass(action) {
+            if(action === 'TRADE') return 'action-trade';
+            if(action === 'WATCH') return 'action-watch';
+            return 'action-skip';
+        }
 
-<!-- TIER 2 -->
-<div class="section-label">Tier 2 — Sector Indexes (Sparkline · Today)</div>
-<div class="tier2-scroll">
+        // 2. టేబుల్ ని డైనమిక్ గా క్రియేట్ చేయడం
+        const tbody = document.getElementById('table-body');
 
-  <div class="spark-card">
-    <div class="card-header"><span class="name">IT</span><span class="meta">BSE:IT</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:IT","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
+        stocksData.forEach(stock => {
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td class="font-bold">${stock.name}</td>
+                <td><div id="chart-${stock.id}"></div></td>
+                <td><span class="badge ${getBadgeClass(stock.d1)}">${stock.d1}</span></td>
+                <td><span class="badge ${getBadgeClass(stock.h1)}">${stock.h1}</span></td>
+                <td><span class="badge ${getBadgeClass(stock.m15)}">${stock.m15}</span></td>
+                <td><span class="badge ${getBadgeClass(stock.m5)}">${stock.m5}</span></td>
+                <td><span class="badge ${getBadgeClass(stock.signal)}">${stock.signal}</span></td>
+                <td><span class="badge ${getActionClass(stock.action)}">${stock.action}</span></td>
+            `;
+            tbody.appendChild(row);
 
-  <div class="spark-card">
-    <div class="card-header"><span class="name">Bankex</span><span class="meta">BSE:BANKEX</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:BANKEX","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
+            // 3. స్పార్క్ లైన్ ని రెండర్ చేయడం (ApexCharts)
+            // గ్రీన్ కలర్ (Bullish) మరియు రెడ్ కలర్ (Bearish) కోసం లాజిక్
+            const isBearish = stock.sparkData[0] > stock.sparkData[stock.sparkData.length - 1];
+            const chartColor = isBearish ? '#ff7b72' : '#3fb950';
 
-  <div class="spark-card">
-    <div class="card-header"><span class="name">Healthcare</span><span class="meta">BSE:HEALTHCARE</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:HEALTHCARE","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
+            var options = {
+                series: [{ data: stock.sparkData }],
+                chart: { type: 'line', width: 150, height: 40, sparkline: { enabled: true } },
+                stroke: { curve: 'smooth', width: 2 },
+                colors: [chartColor],
+                tooltip: {
+                    fixed: { enabled: false },
+                    x: { show: false },
+                    y: { title: { formatter: function (seriesName) { return '' } } },
+                    marker: { show: false }
+                }
+            };
 
-  <div class="spark-card">
-    <div class="card-header"><span class="name">Auto</span><span class="meta">BSE:AUTO</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:AUTO","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-  <div class="spark-card">
-    <div class="card-header"><span class="name">FMCG</span><span class="meta">BSE:FMCG</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:FMCG","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-  <div class="spark-card">
-    <div class="card-header"><span class="name">Metal</span><span class="meta">BSE:METAL</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:METAL","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-  <div class="spark-card">
-    <div class="card-header"><span class="name">Realty</span><span class="meta">BSE:REALTY</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:REALTY","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-  <div class="spark-card">
-    <div class="card-header"><span class="name">Energy</span><span class="meta">BSE:ENERGY</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:ENERGY","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- TIER 3 -->
-<div class="section-label">Tier 3 — Sector Stocks (Sparkline · Today)</div>
-<div class="tier3-scroll">
-
-  <div class="stock-card">
-    <div class="card-header"><span class="name">TCS</span><span class="meta">IT</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:TCS","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-  <div class="stock-card">
-    <div class="card-header"><span class="name">Infosys</span><span class="meta">IT</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:INFY","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-  <div class="stock-card">
-    <div class="card-header"><span class="name">Wipro</span><span class="meta">IT</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:WIPRO","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-  <div class="stock-card">
-    <div class="card-header"><span class="name">HDFC Bank</span><span class="meta">Bank</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:HDFCBANK","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-  <div class="stock-card">
-    <div class="card-header"><span class="name">ICICI Bank</span><span class="meta">Bank</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:ICICIBANK","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-  <div class="stock-card">
-    <div class="card-header"><span class="name">Axis Bank</span><span class="meta">Bank</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:AXISBANK","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-  <div class="stock-card">
-    <div class="card-header"><span class="name">Sun Pharma</span><span class="meta">Pharma</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:SUNPHARMA","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-  <div class="stock-card">
-    <div class="card-header"><span class="name">Maruti</span><span class="meta">Auto</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:MARUTI","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-  <div class="stock-card">
-    <div class="card-header"><span class="name">Tata Motors</span><span class="meta">Auto</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:TATAMOTORS","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- SIGNAL SCANNER -->
-<div class="section-label" style="margin-top:6px">Signal Scanner — Active Setups</div>
-<div class="scanner-bar">
-  <div class="signal-chip active-sig">
-    <div class="sig-label">Breakout</div>
-    <div class="sig-stocks">TCS · INFY · SUNPHARMA</div>
-  </div>
-  <div class="signal-chip">
-    <div class="sig-label">Volume Spike</div>
-    <div class="sig-stocks">HDFCBANK · MARUTI</div>
-  </div>
-  <div class="signal-chip active-sig">
-    <div class="sig-label">Momentum</div>
-    <div class="sig-stocks">ICICIBANK · TCS</div>
-  </div>
-  <div class="signal-chip">
-    <div class="sig-label">Vol Profile</div>
-    <div class="sig-stocks">INFY — near POC</div>
-  </div>
-  <div class="signal-chip">
-    <div class="sig-label">Reversal</div>
-    <div class="sig-stocks">No setup today</div>
-  </div>
-</div>
-
-<!-- MTF MATRIX with sparkline per row -->
-<div class="section-label" style="margin-top:6px">MTF Confirmation Matrix — Trade / Watch / Skip</div>
-<div class="matrix-wrap">
-  <table class="matrix-table">
-    <thead>
-      <tr>
-        <th>Stock</th>
-        <th style="width:185px">Intraday Chart</th>
-        <th>D1</th><th>H1</th><th>15m</th><th>5m</th><th>Signal</th><th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-
-      <tr>
-        <td>TCS</td>
-        <td style="padding:2px 4px">
-          <div class="tradingview-widget-container" style="height:58px;width:178px">
-            <div class="tradingview-widget-container__widget" style="height:58px;width:178px"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-            {"symbol":"BSE:TCS","width":178,"height":58,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false}
-            </script>
-          </div>
-        </td>
-        <td><span class="badge b-bull">Bull</span></td>
-        <td><span class="badge b-bull">Bull</span></td>
-        <td><span class="badge b-bull">BO</span></td>
-        <td><span class="badge b-warn">Flat</span></td>
-        <td><span class="badge b-bull">Breakout</span></td>
-        <td><span class="badge b-trade">TRADE</span></td>
-      </tr>
-
-      <tr>
-        <td>INFY</td>
-        <td style="padding:2px 4px">
-          <div class="tradingview-widget-container" style="height:58px;width:178px">
-            <div class="tradingview-widget-container__widget" style="height:58px;width:178px"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-            {"symbol":"BSE:INFY","width":178,"height":58,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false}
-            </script>
-          </div>
-        </td>
-        <td><span class="badge b-bull">Bull</span></td>
-        <td><span class="badge b-bull">Bull</span></td>
-        <td><span class="badge b-bull">Mom</span></td>
-        <td><span class="badge b-bull">Bull</span></td>
-        <td><span class="badge b-bull">Momentum</span></td>
-        <td><span class="badge b-trade">TRADE</span></td>
-      </tr>
-
-      <tr>
-        <td>HDFCBANK</td>
-        <td style="padding:2px 4px">
-          <div class="tradingview-widget-container" style="height:58px;width:178px">
-            <div class="tradingview-widget-container__widget" style="height:58px;width:178px"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-            {"symbol":"BSE:HDFCBANK","width":178,"height":58,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false}
-            </script>
-          </div>
-        </td>
-        <td><span class="badge b-bull">Bull</span></td>
-        <td><span class="badge b-warn">Chop</span></td>
-        <td><span class="badge b-bull">Vol</span></td>
-        <td><span class="badge b-bull">Mom</span></td>
-        <td><span class="badge b-warn">Vol Spike</span></td>
-        <td><span class="badge b-watch">WATCH</span></td>
-      </tr>
-
-      <tr>
-        <td>ICICIBANK</td>
-        <td style="padding:2px 4px">
-          <div class="tradingview-widget-container" style="height:58px;width:178px">
-            <div class="tradingview-widget-container__widget" style="height:58px;width:178px"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-            {"symbol":"BSE:ICICIBANK","width":178,"height":58,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false}
-            </script>
-          </div>
-        </td>
-        <td><span class="badge b-bull">Bull</span></td>
-        <td><span class="badge b-bull">Bull</span></td>
-        <td><span class="badge b-warn">Flat</span></td>
-        <td><span class="badge b-neut">Neut</span></td>
-        <td><span class="badge b-warn">Wait</span></td>
-        <td><span class="badge b-watch">WATCH</span></td>
-      </tr>
-
-      <tr>
-        <td>SUNPHARMA</td>
-        <td style="padding:2px 4px">
-          <div class="tradingview-widget-container" style="height:58px;width:178px">
-            <div class="tradingview-widget-container__widget" style="height:58px;width:178px"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-            {"symbol":"BSE:SUNPHARMA","width":178,"height":58,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false}
-            </script>
-          </div>
-        </td>
-        <td><span class="badge b-bull">Bull</span></td>
-        <td><span class="badge b-bull">Bull</span></td>
-        <td><span class="badge b-bull">BO</span></td>
-        <td><span class="badge b-bull">Bull</span></td>
-        <td><span class="badge b-bull">Breakout</span></td>
-        <td><span class="badge b-trade">TRADE</span></td>
-      </tr>
-
-      <tr>
-        <td>MARUTI</td>
-        <td style="padding:2px 4px">
-          <div class="tradingview-widget-container" style="height:58px;width:178px">
-            <div class="tradingview-widget-container__widget" style="height:58px;width:178px"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-            {"symbol":"BSE:MARUTI","width":178,"height":58,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false}
-            </script>
-          </div>
-        </td>
-        <td><span class="badge b-bear">Bear</span></td>
-        <td><span class="badge b-bear">Bear</span></td>
-        <td><span class="badge b-warn">Flat</span></td>
-        <td><span class="badge b-bear">Weak</span></td>
-        <td><span class="badge b-bear">No setup</span></td>
-        <td><span class="badge b-skip">SKIP</span></td>
-      </tr>
-
-    </tbody>
-  </table>
-  <div style="font-size:11px;color:#475569;margin-top:5px">Rule: D1 + H1 రెండూ Bull అయినప్పుడే entry చేయండి. ఒక్కటి Bear అయినా — SKIP.</div>
-</div>
-
-<div id="footer">LotusFx Intraday Aerial View &nbsp;|&nbsp; Live charts: TradingView (BSE) &nbsp;|&nbsp; Built for personal use — not financial advice</div>
-
-<script>
-function tick() {
-  const ist = new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
-  const h = String(ist.getHours()).padStart(2,'0');
-  const m = String(ist.getMinutes()).padStart(2,'0');
-  const s = String(ist.getSeconds()).padStart(2,'0');
-  document.getElementById('clock').textContent = 'IST ' + h + ':' + m + ':' + s;
-  const open = (ist.getHours() > 9 || (ist.getHours()===9 && ist.getMinutes()>=15));
-  const close = (ist.getHours() > 15 || (ist.getHours()===15 && ist.getMinutes()>=30));
-  const chip = document.getElementById('breadth-chip');
-  if (!open || close) { chip.textContent = 'MARKET CLOSED'; chip.className = 'pulse-chip bear'; }
-  else { chip.textContent = 'MARKET OPEN'; chip.className = 'pulse-chip bull'; }
-}
-setInterval(tick, 1000); tick();
-</script>
+            var chart = new ApexCharts(document.querySelector(`#chart-${stock.id}`), options);
+            chart.render();
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intraday Aerial View Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0d0f14; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; font-size: 13px; }
+
+  /* ── TOP BAR ── */
+  #topbar {
+    background: #141720;
+    border-bottom: 1px solid #222636;
+    padding: 6px 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  #topbar .title { font-size: 13px; font-weight: 600; color: #7c9fff; margin-right: 10px; letter-spacing: .5px; }
+  .pulse-chip {
+    padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .pulse-chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+  .bull  { background: #0d2e1a; color: #34d399; border: 1px solid #1a5c38; }
+  .bear  { background: #2e0d0d; color: #f87171; border: 1px solid #5c1a1a; }
+  .neut  { background: #1e1e2e; color: #94a3b8; border: 1px solid #334155; }
+  .warn  { background: #2e1f0d; color: #fbbf24; border: 1px solid #78460d; }
+  #clock { margin-left: auto; font-size: 12px; color: #64748b; font-variant-numeric: tabular-nums; }
+
+  /* ── LAYOUT ── */
+  .section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: #475569;
+    padding: 6px 16px 2px; text-transform: uppercase;
+  }
+  .row { display: flex; gap: 8px; padding: 6px 12px; flex-wrap: wrap; }
+
+  /* ── TIER CARDS ── */
+  .tv-card {
+    background: #141720;
+    border: 1px solid #1e2436;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .tv-card .card-header {
+    padding: 6px 10px;
+    background: #1a1f2e;
+    border-bottom: 1px solid #1e2436;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .card-header .name { font-size: 12px; font-weight: 600; color: #cbd5e1; }
+  .card-header .meta { font-size: 10px; color: #475569; }
+  .card-body { flex: 1; }
+
+  /* ── TIER 1 — Nifty Indexes ── */
+  .tier1-card { flex: 1; min-width: 200px; height: 220px; }
+
+  /* ── TIER 2 — Sector Indexes (horizontal scroll) ── */
+  .tier2-scroll {
+    display: flex; gap: 8px;
+    padding: 6px 12px 6px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #2a3040 transparent;
+  }
+  .tier2-card { flex-shrink: 0; width: 220px; height: 180px; }
+
+  /* ── TIER 3 — Sector Stocks ── */
+  .tier3-grid {
+    display: flex; gap: 8px; padding: 0 12px; flex-wrap: wrap;
+  }
+  .tier3-card { width: 160px; height: 160px; }
+
+  /* ── SIGNAL MATRIX ── */
+  .matrix-wrap { padding: 0 12px 6px; }
+  .matrix-table {
+    width: 100%; border-collapse: collapse;
+    background: #141720; border: 1px solid #1e2436; border-radius: 8px; overflow: hidden;
+  }
+  .matrix-table th {
+    background: #1a1f2e; padding: 7px 10px;
+    font-size: 10px; font-weight: 700; letter-spacing: .8px;
+    color: #475569; text-transform: uppercase; text-align: center;
+  }
+  .matrix-table th:first-child { text-align: left; }
+  .matrix-table td {
+    padding: 6px 10px; text-align: center;
+    border-top: 1px solid #1a1f2e; font-size: 12px;
+  }
+  .matrix-table td:first-child { text-align: left; font-weight: 600; color: #cbd5e1; }
+  .matrix-table tr:hover td { background: #1a1f2e; }
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 12px;
+    font-size: 10px; font-weight: 700;
+  }
+  .b-bull  { background: #0d2e1a; color: #34d399; }
+  .b-bear  { background: #2e0d0d; color: #f87171; }
+  .b-neut  { background: #1e2030; color: #94a3b8; }
+  .b-warn  { background: #2e1f0d; color: #fbbf24; }
+  .b-trade { background: #0a3020; color: #10b981; border: 1px solid #065f46; }
+  .b-watch { background: #2c1e08; color: #f59e0b; border: 1px solid #92400e; }
+  .b-skip  { background: #2c0a0a; color: #ef4444; border: 1px solid #991b1b; }
+
+  /* ── SIGNAL SCANNER BAR ── */
+  .scanner-bar {
+    display: flex; gap: 8px; padding: 6px 12px; flex-wrap: wrap;
+  }
+  .signal-chip {
+    background: #141720; border: 1px solid #1e2436; border-radius: 8px;
+    padding: 8px 14px; flex: 1; min-width: 120px;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .signal-chip .sig-label { font-size: 10px; color: #475569; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; }
+  .signal-chip .sig-stocks { font-size: 12px; color: #94a3b8; }
+  .signal-chip.active-sig { border-color: #1a5c38; }
+  .signal-chip.active-sig .sig-label { color: #34d399; }
+  .signal-chip.active-sig .sig-stocks { color: #6ee7b7; }
+
+  /* ── FOOTER ── */
+  #footer {
+    text-align: center; padding: 8px; font-size: 10px; color: #334155;
+    border-top: 1px solid #1a1f2e; margin-top: 6px;
+  }
+  /* scrollbar */
+  ::-webkit-scrollbar { height: 4px; width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #2a3040; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ TOP BAR ══════════ -->
+<div id="topbar">
+  <span class="title">&#9733; INTRADAY AERIAL VIEW</span>
+  <span class="pulse-chip bull" id="nifty-chip">NIFTY BULL</span>
+  <span class="pulse-chip bull" id="bn-chip">BANK NIFTY BULL</span>
+  <span class="pulse-chip warn" id="vix-chip">VIX 14.2</span>
+  <span class="pulse-chip neut" id="pcr-chip">PCR 0.92</span>
+  <span class="pulse-chip neut" id="breadth-chip">BREADTH 61%</span>
+  <span id="clock">--:--:--</span>
+</div>
+
+<!-- ══════════ TIER 1 — NIFTY INDEXES ══════════ -->
+<div class="section-label">Tier 1 — Nifty Indexes (Market Direction)</div>
+<div class="row">
+
+  <div class="tv-card tier1-card">
+    <div class="card-header">
+      <span class="name">Nifty 50</span>
+      <span class="meta">NSE:NIFTY · H1</span>
+    </div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:NIFTY", "interval": "60", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en",
+          "toolbar_bg": "#141720", "enable_publishing": false,
+          "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies","Volume@tv-basicstudies"],
+          "height": "100%", "width": "100%", "container_id": "tv_nifty" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tv-card tier1-card">
+    <div class="card-header">
+      <span class="name">Bank Nifty</span>
+      <span class="meta">NSE:BANKNIFTY · H1</span>
+    </div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:BANKNIFTY", "interval": "60", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en",
+          "toolbar_bg": "#141720", "enable_publishing": false,
+          "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies","Volume@tv-basicstudies"],
+          "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tv-card tier1-card">
+    <div class="card-header">
+      <span class="name">Nifty MidCap 50</span>
+      <span class="meta">NSE:NIFTYMIDCAP50 · H1</span>
+    </div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:NIFTYMIDCAP50", "interval": "60", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en",
+          "toolbar_bg": "#141720", "enable_publishing": false,
+          "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies"],
+          "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════ TIER 2 — SECTOR INDEXES (scroll) ══════════ -->
+<div class="section-label">Tier 2 — Sector Indexes (Leading / Lagging)</div>
+<div class="tier2-scroll">
+
+  <div class="tv-card tier2-card">
+    <div class="card-header">
+      <span class="name">Nifty IT</span><span class="meta">15m</span>
+    </div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:CNXIT", "interval": "15", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#141720",
+          "enable_publishing": false, "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies"], "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tv-card tier2-card">
+    <div class="card-header">
+      <span class="name">Nifty Bank</span><span class="meta">15m</span>
+    </div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:BANKNIFTY", "interval": "15", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#141720",
+          "enable_publishing": false, "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies"], "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tv-card tier2-card">
+    <div class="card-header">
+      <span class="name">Nifty Pharma</span><span class="meta">15m</span>
+    </div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:CNXPHARMA", "interval": "15", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#141720",
+          "enable_publishing": false, "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies"], "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tv-card tier2-card">
+    <div class="card-header">
+      <span class="name">Nifty Auto</span><span class="meta">15m</span>
+    </div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:CNXAUTO", "interval": "15", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#141720",
+          "enable_publishing": false, "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies"], "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tv-card tier2-card">
+    <div class="card-header">
+      <span class="name">Nifty FMCG</span><span class="meta">15m</span>
+    </div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:CNXFMCG", "interval": "15", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#141720",
+          "enable_publishing": false, "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies"], "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tv-card tier2-card">
+    <div class="card-header">
+      <span class="name">Nifty Metal</span><span class="meta">15m</span>
+    </div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:CNXMETAL", "interval": "15", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#141720",
+          "enable_publishing": false, "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies"], "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tv-card tier2-card">
+    <div class="card-header">
+      <span class="name">Nifty Realty</span><span class="meta">15m</span>
+    </div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:CNXREALTY", "interval": "15", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#141720",
+          "enable_publishing": false, "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies"], "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════ TIER 3 — SECTOR STOCKS ══════════ -->
+<div class="section-label">Tier 3 — Sector Stocks (15m)</div>
+<div class="tier3-grid">
+
+  <div class="tv-card tier3-card">
+    <div class="card-header"><span class="name">TCS</span><span class="meta">IT · 15m</span></div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:TCS", "interval": "15", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#141720",
+          "enable_publishing": false, "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies","Volume@tv-basicstudies"],
+          "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tv-card tier3-card">
+    <div class="card-header"><span class="name">Infosys</span><span class="meta">IT · 15m</span></div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:INFY", "interval": "15", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#141720",
+          "enable_publishing": false, "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies","Volume@tv-basicstudies"],
+          "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tv-card tier3-card">
+    <div class="card-header"><span class="name">HDFC Bank</span><span class="meta">Bank · 15m</span></div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:HDFCBANK", "interval": "15", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#141720",
+          "enable_publishing": false, "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies","Volume@tv-basicstudies"],
+          "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tv-card tier3-card">
+    <div class="card-header"><span class="name">ICICI Bank</span><span class="meta">Bank · 15m</span></div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:ICICIBANK", "interval": "15", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#141720",
+          "enable_publishing": false, "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies","Volume@tv-basicstudies"],
+          "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tv-card tier3-card">
+    <div class="card-header"><span class="name">Sun Pharma</span><span class="meta">Pharma · 15m</span></div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:SUNPHARMA", "interval": "15", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#141720",
+          "enable_publishing": false, "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies","Volume@tv-basicstudies"],
+          "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="tv-card tier3-card">
+    <div class="card-header"><span class="name">Maruti</span><span class="meta">Auto · 15m</span></div>
+    <div class="card-body">
+      <div class="tradingview-widget-container" style="height:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+        { "symbol": "NSE:MARUTI", "interval": "15", "timezone": "Asia/Kolkata",
+          "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#141720",
+          "enable_publishing": false, "withdateranges": false, "hide_side_toolbar": true,
+          "allow_symbol_change": false, "save_image": false,
+          "studies": ["MAExp@tv-basicstudies","Volume@tv-basicstudies"],
+          "height": "100%", "width": "100%" }
+        </script>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════ SIGNAL SCANNER ══════════ -->
+<div class="section-label" style="margin-top:8px">Signal Scanner — Active Setups</div>
+<div class="scanner-bar">
+  <div class="signal-chip active-sig">
+    <span class="sig-label">Breakout</span>
+    <span class="sig-stocks">TCS · INFY · SUNPHARMA</span>
+  </div>
+  <div class="signal-chip">
+    <span class="sig-label">Volume Spike</span>
+    <span class="sig-stocks">HDFCBANK · MARUTI</span>
+  </div>
+  <div class="signal-chip active-sig">
+    <span class="sig-label">Momentum</span>
+    <span class="sig-stocks">ICICIBANK · TCS</span>
+  </div>
+  <div class="signal-chip">
+    <span class="sig-label">Vol Profile</span>
+    <span class="sig-stocks">INFY — near POC</span>
+  </div>
+  <div class="signal-chip">
+    <span class="sig-label">Reversal</span>
+    <span class="sig-stocks">No setup today</span>
+  </div>
+</div>
+
+<!-- ══════════ MTF MATRIX ══════════ -->
+<div class="section-label" style="margin-top:8px">MTF Confirmation Matrix — Trade / Watch / Skip</div>
+<div class="matrix-wrap">
+  <table class="matrix-table">
+    <thead>
+      <tr>
+        <th>Stock</th>
+        <th>D1</th>
+        <th>H1</th>
+        <th>15m</th>
+        <th>5m</th>
+        <th>Signal</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="matrix-body">
+      <tr>
+        <td>TCS</td>
+        <td><span class="badge b-bull">Bull</span></td>
+        <td><span class="badge b-bull">Bull</span></td>
+        <td><span class="badge b-bull">BO</span></td>
+        <td><span class="badge b-warn">Flat</span></td>
+        <td><span class="badge b-bull">Breakout</span></td>
+        <td><span class="badge b-trade">TRADE</span></td>
+      </tr>
+      <tr>
+        <td>INFY</td>
+        <td><span class="badge b-bull">Bull</span></td>
+        <td><span class="badge b-bull">Bull</span></td>
+        <td><span class="badge b-bull">Mom</span></td>
+        <td><span class="badge b-bull">Bull</span></td>
+        <td><span class="badge b-bull">Momentum</span></td>
+        <td><span class="badge b-trade">TRADE</span></td>
+      </tr>
+      <tr>
+        <td>HDFCBANK</td>
+        <td><span class="badge b-bull">Bull</span></td>
+        <td><span class="badge b-warn">Chop</span></td>
+        <td><span class="badge b-bull">Vol</span></td>
+        <td><span class="badge b-bull">Mom</span></td>
+        <td><span class="badge b-warn">Vol Spike</span></td>
+        <td><span class="badge b-watch">WATCH</span></td>
+      </tr>
+      <tr>
+        <td>ICICIBANK</td>
+        <td><span class="badge b-bull">Bull</span></td>
+        <td><span class="badge b-bull">Bull</span></td>
+        <td><span class="badge b-warn">Flat</span></td>
+        <td><span class="badge b-neut">Neut</span></td>
+        <td><span class="badge b-warn">Wait</span></td>
+        <td><span class="badge b-watch">WATCH</span></td>
+      </tr>
+      <tr>
+        <td>SUNPHARMA</td>
+        <td><span class="badge b-bull">Bull</span></td>
+        <td><span class="badge b-bull">Bull</span></td>
+        <td><span class="badge b-bull">BO</span></td>
+        <td><span class="badge b-bull">Bull</span></td>
+        <td><span class="badge b-bull">Breakout</span></td>
+        <td><span class="badge b-trade">TRADE</span></td>
+      </tr>
+      <tr>
+        <td>MARUTI</td>
+        <td><span class="badge b-bear">Bear</span></td>
+        <td><span class="badge b-bear">Bear</span></td>
+        <td><span class="badge b-warn">Flat</span></td>
+        <td><span class="badge b-bear">Weak</span></td>
+        <td><span class="badge b-bear">No setup</span></td>
+        <td><span class="badge b-skip">SKIP</span></td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="font-size:11px;color:#475569;margin-top:6px;padding-left:2px">
+    Rule: D1 + H1 రెండూ Bull అయినప్పుడే entry consider చేయండి. ఒక్కటి Bear అయినా — SKIP.
+  </div>
+</div>
+
+<div id="footer">
+  Intraday Aerial View Dashboard &nbsp;|&nbsp; Live charts: TradingView &nbsp;|&nbsp;
+  MTF matrix: manually update every morning &nbsp;|&nbsp;
+  Built for personal use only — not financial advice
+</div>
+
+<script>
+  function tick() {
+    const now = new Date();
+    const ist = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+    const h = String(ist.getHours()).padStart(2,'0');
+    const m = String(ist.getMinutes()).padStart(2,'0');
+    const s = String(ist.getSeconds()).padStart(2,'0');
+    document.getElementById('clock').textContent = 'IST ' + h + ':' + m + ':' + s;
+
+    const hh = ist.getHours();
+    const mm = ist.getMinutes();
+    const marketOpen = (hh > 9 || (hh === 9 && mm >= 15));
+    const marketClose = (hh > 15 || (hh === 15 && mm >= 30));
+    const isMarket = marketOpen && !marketClose;
+
+    const breadth = document.getElementById('breadth-chip');
+    if (!isMarket) {
+      breadth.textContent = 'MARKET CLOSED';
+      breadth.className = 'pulse-chip neut';
+    }
+  }
+  setInterval(tick, 1000);
+  tick();
+</script>
+</body>
+</html>

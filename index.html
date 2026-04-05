@@ -2,113 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LotusFx - MTF Confirmation Matrix</title>
+    <title>LotusFx - Nifty 50 Matrix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>
-        body { background-color: #0d1117; color: #c9d1d9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .matrix-table { width: 100%; border-collapse: collapse; }
-        .matrix-table th { color: #8b949e; text-transform: uppercase; font-size: 0.75rem; padding: 16px; text-align: left; border-bottom: 1px solid #30363d; background: #161b22; }
-        .matrix-table td { padding: 12px 16px; border-bottom: 1px solid #21262d; vertical-align: middle; background: #0d1117; }
-        
-        /* కస్టమ్ బ్యాడ్జ్ స్టైల్స్ */
-        .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-align: center; display: inline-block; }
-        
-        .badge-bull { background: rgba(46, 160, 67, 0.15); color: #3fb950; }
-        .badge-bear { background: rgba(248, 81, 73, 0.15); color: #ff7b72; }
-        .badge-flat { background: rgba(210, 153, 34, 0.15); color: #e3b341; }
-        .badge-neut { background: rgba(139, 148, 158, 0.15); color: #8b949e; }
-        
-        .action-trade { border: 1px solid #3fb950; color: #3fb950; background: transparent; border-radius: 20px; padding: 4px 12px;}
-        .action-watch { border: 1px solid #e3b341; color: #e3b341; background: transparent; border-radius: 20px; padding: 4px 12px;}
-        .action-skip { border: 1px solid #ff7b72; color: #ff7b72; background: transparent; border-radius: 20px; padding: 4px 12px;}
+        body { background-color: #0d1117; color: #c9d1d9; font-family: sans-serif; }
+        .matrix-table th { background: #161b22; border-bottom: 1px solid #30363d; padding: 12px; text-align: left; font-size: 0.8rem; color: #8b949e; }
+        .matrix-table td { border-bottom: 1px solid #21262d; padding: 8px 12px; font-size: 0.85rem; }
+        .badge { padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 0.7rem; }
+        .bull { background: rgba(63, 185, 80, 0.2); color: #3fb950; }
+        .bear { background: rgba(248, 81, 73, 0.2); color: #f85149; }
     </style>
 </head>
-<body class="p-8">
-
-    <div class="max-w-6xl mx-auto border border-gray-800 rounded-lg overflow-hidden shadow-lg">
-        <table class="matrix-table">
+<body>
+    <div class="p-4">
+        <h2 class="text-xl font-bold mb-4">NIFTY 50 - INTRADAY AERIAL VIEW</h2>
+        <table class="matrix-table w-full border border-gray-800">
             <thead>
                 <tr>
-                    <th>Stock</th>
-                    <th style="width: 200px;">Intraday Chart</th>
+                    <th>STOCK</th>
+                    <th>INTRADAY SPARKLINE</th>
                     <th>D1</th>
                     <th>H1</th>
                     <th>15M</th>
-                    <th>5M</th>
-                    <th>Signal</th>
-                    <th>Action</th>
+                    <th>SIGNAL</th>
                 </tr>
             </thead>
-            <tbody id="table-body">
-                </tbody>
+            <tbody id="nifty-body"></tbody>
         </table>
     </div>
 
     <script>
-        // 1. డాటా (ఇది మీ API నుండి వచ్చే డాటా అనుకోండి)
-        // sparkData లో ఉన్న నంబర్స్ ఇంట్రాడే ప్రైస్ మూమెంట్స్ ని సూచిస్తాయి
-        const stocksData = [
-            { id: 'TCS', name: 'TCS', sparkData: [3500, 3510, 3490, 3520, 3540, 3530, 3560], d1: 'Bull', h1: 'Bull', m15: 'BO', m5: 'Flat', signal: 'Breakout', action: 'TRADE' },
-            { id: 'INFY', name: 'INFY', sparkData: [1400, 1410, 1430, 1420, 1450, 1460, 1480], d1: 'Bull', h1: 'Bull', m15: 'Mom', m5: 'Bull', signal: 'Momentum', action: 'TRADE' },
-            { id: 'HDFCBANK', name: 'HDFCBANK', sparkData: [1600, 1590, 1610, 1605, 1620, 1615, 1630], d1: 'Bull', h1: 'Chop', m15: 'Vol', m5: 'Mom', signal: 'Vol Spike', action: 'WATCH' },
-            { id: 'ICICIBANK', name: 'ICICIBANK', sparkData: [1050, 1045, 1055, 1050, 1048, 1052, 1050], d1: 'Bull', h1: 'Bull', m15: 'Flat', m5: 'Neut', signal: 'Wait', action: 'WATCH' },
-            { id: 'MARUTI', name: 'MARUTI', sparkData: [10200, 10150, 10100, 10050, 10080, 10000, 9950], d1: 'Bear', h1: 'Bear', m15: 'Flat', m5: 'Weak', signal: 'No setup', action: 'SKIP' }
+        // Nifty 50 Symbols List
+        const symbols = [
+            "ADANIENT", "ADANIPORTS", "APOLLOHOSP", "ASIANPAINT", "AXISBANK", "BAJAJ-AUTO", "BAJFINANCE", "BAJAJFINSV", "BPCL", "BHARTIARTL", 
+            "BRITANNIA", "CIPLA", "COALINDIA", "DIVISLAB", "DRREDDY", "EICHERMOT", "GRASIM", "HCLTECH", "HDFCBANK", "HDFCLIFE", 
+            "HEROMOTOCO", "HINDALCO", "HINDUNILVR", "ICICIBANK", "ITC", "INDUSINDBK", "INFY", "JSWSTEEL", "KOTAKBANK", "LT", 
+            "LTIM", "M&M", "MARUTI", "NTPC", "NESTLEIND", "ONGC", "POWERGRID", "RELIANCE", "SBILIFE", "SBIN", 
+            "SUNPHARMA", "TATACONSUM", "TATAMOTORS", "TATASTEEL", "TCS", "TECHM", "TITAN", "ULTRACEMCO", "UPL", "WIPRO"
         ];
 
-        // బ్యాడ్జ్ కలర్స్ కోసం హెల్పర్ ఫంక్షన్స్
-        function getBadgeClass(val) {
-            if(['Bull', 'BO', 'Mom', 'Breakout', 'Momentum'].includes(val)) return 'badge-bull';
-            if(['Bear', 'Weak', 'No setup'].includes(val)) return 'badge-bear';
-            if(['Chop', 'Flat', 'Vol', 'Vol Spike', 'Wait'].includes(val)) return 'badge-flat';
-            return 'badge-neut';
-        }
+        const tbody = document.getElementById('nifty-body');
 
-        function getActionClass(action) {
-            if(action === 'TRADE') return 'action-trade';
-            if(action === 'WATCH') return 'action-watch';
-            return 'action-skip';
-        }
-
-        // 2. టేబుల్ ని డైనమిక్ గా క్రియేట్ చేయడం
-        const tbody = document.getElementById('table-body');
-
-        stocksData.forEach(stock => {
+        symbols.forEach(sym => {
             const row = document.createElement('tr');
-            
+            // Generating dummy trends for sparklines (Real API data can replace this)
+            const trend = Array.from({length: 10}, () => Math.floor(Math.random() * 100));
+            const isUp = trend[0] < trend[9];
+
             row.innerHTML = `
-                <td class="font-bold">${stock.name}</td>
-                <td><div id="chart-${stock.id}"></div></td>
-                <td><span class="badge ${getBadgeClass(stock.d1)}">${stock.d1}</span></td>
-                <td><span class="badge ${getBadgeClass(stock.h1)}">${stock.h1}</span></td>
-                <td><span class="badge ${getBadgeClass(stock.m15)}">${stock.m15}</span></td>
-                <td><span class="badge ${getBadgeClass(stock.m5)}">${stock.m5}</span></td>
-                <td><span class="badge ${getBadgeClass(stock.signal)}">${stock.signal}</span></td>
-                <td><span class="badge ${getActionClass(stock.action)}">${stock.action}</span></td>
+                <td class="font-bold">${sym}</td>
+                <td><div id="spark-${sym}"></div></td>
+                <td><span class="badge ${isUp ? 'bull' : 'bear'}">${isUp ? 'BULL' : 'BEAR'}</span></td>
+                <td><span class="badge ${Math.random() > 0.5 ? 'bull' : 'bear'}">OK</span></td>
+                <td><span class="badge bull">BUY</span></td>
+                <td class="text-xs text-gray-400">TRENDING</td>
             `;
             tbody.appendChild(row);
 
-            // 3. స్పార్క్ లైన్ ని రెండర్ చేయడం (ApexCharts)
-            // గ్రీన్ కలర్ (Bullish) మరియు రెడ్ కలర్ (Bearish) కోసం లాజిక్
-            const isBearish = stock.sparkData[0] > stock.sparkData[stock.sparkData.length - 1];
-            const chartColor = isBearish ? '#ff7b72' : '#3fb950';
-
-            var options = {
-                series: [{ data: stock.sparkData }],
-                chart: { type: 'line', width: 150, height: 40, sparkline: { enabled: true } },
+            new ApexCharts(document.querySelector(`#spark-${sym}`), {
+                series: [{ data: trend }],
+                chart: { type: 'line', width: 120, height: 30, sparkline: { enabled: true } },
                 stroke: { curve: 'smooth', width: 2 },
-                colors: [chartColor],
-                tooltip: {
-                    fixed: { enabled: false },
-                    x: { show: false },
-                    y: { title: { formatter: function (seriesName) { return '' } } },
-                    marker: { show: false }
-                }
-            };
-
-            var chart = new ApexCharts(document.querySelector(`#chart-${stock.id}`), options);
-            chart.render();
+                colors: [isUp ? '#3fb950' : '#f85149']
+            }).render();
         });
     </script>
 </body>

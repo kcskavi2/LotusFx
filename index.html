@@ -81,13 +81,16 @@
   .signal-chip.active-sig .sig-stocks { color: #6ee7b7; }
 
   /* MTF MATRIX */
-  .matrix-wrap { padding: 4px 12px 8px; }
-  .matrix-table { width: 100%; border-collapse: collapse; background: #141720; border: 1px solid #1e2436; border-radius: 8px; overflow: hidden; }
+  .matrix-wrap { padding: 4px 12px 8px; overflow-x: auto; }
+  .matrix-table { width: 100%; border-collapse: collapse; background: #141720; border: 1px solid #1e2436; border-radius: 8px; overflow: hidden; min-width: 780px; }
   .matrix-table th { background: #1a1f2e; padding: 6px 8px; font-size: 10px; font-weight: 700; letter-spacing: .8px; color: #475569; text-transform: uppercase; text-align: center; }
-  .matrix-table th:first-child { text-align: left; }
-  .matrix-table td { padding: 5px 8px; text-align: center; border-top: 1px solid #1a1f2e; font-size: 11px; }
-  .matrix-table td:first-child { text-align: left; font-weight: 600; color: #cbd5e1; }
+  .matrix-table th:first-child { text-align: left; min-width: 90px; }
+  .matrix-table th.th-chart { min-width: 160px; }
+  .matrix-table td { padding: 4px 8px; text-align: center; border-top: 1px solid #1a1f2e; font-size: 11px; }
+  .matrix-table td:first-child { text-align: left; font-weight: 600; color: #cbd5e1; vertical-align: middle; }
+  .matrix-table td.td-chart { padding: 3px 6px; }
   .matrix-table tr:hover td { background: #1a1f2e; }
+  .spark-cell { width: 160px; height: 60px; display: block; }
   .badge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; }
   .b-bull  { background: #0d2e1a; color: #34d399; }
   .b-bear  { background: #2e0d0d; color: #f87171; }
@@ -416,12 +419,22 @@
   <table class="matrix-table">
     <thead>
       <tr>
-        <th>Stock</th><th>D1</th><th>H1</th><th>15m</th><th>5m</th><th>Signal</th><th>Action</th>
+        <th>Stock</th>
+        <th class="th-chart">Intraday Chart</th>
+        <th>D1</th><th>H1</th><th>15m</th><th>5m</th><th>Signal</th><th>Action</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>TCS</td>
+        <td class="td-chart">
+          <div class="tradingview-widget-container spark-cell">
+            <div class="tradingview-widget-container__widget" style="height:60px;width:160px"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+            {"symbol":"NSE:TCS","width":160,"height":60,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
+            </script>
+          </div>
+        </td>
         <td><span class="badge b-bull">Bull</span></td>
         <td><span class="badge b-bull">Bull</span></td>
         <td><span class="badge b-bull">BO</span></td>
@@ -431,6 +444,14 @@
       </tr>
       <tr>
         <td>INFY</td>
+        <td class="td-chart">
+          <div class="tradingview-widget-container spark-cell">
+            <div class="tradingview-widget-container__widget" style="height:60px;width:160px"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+            {"symbol":"NSE:INFY","width":160,"height":60,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
+            </script>
+          </div>
+        </td>
         <td><span class="badge b-bull">Bull</span></td>
         <td><span class="badge b-bull">Bull</span></td>
         <td><span class="badge b-bull">Mom</span></td>
@@ -440,6 +461,14 @@
       </tr>
       <tr>
         <td>HDFCBANK</td>
+        <td class="td-chart">
+          <div class="tradingview-widget-container spark-cell">
+            <div class="tradingview-widget-container__widget" style="height:60px;width:160px"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+            {"symbol":"NSE:HDFCBANK","width":160,"height":60,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
+            </script>
+          </div>
+        </td>
         <td><span class="badge b-bull">Bull</span></td>
         <td><span class="badge b-warn">Chop</span></td>
         <td><span class="badge b-bull">Vol</span></td>
@@ -449,6 +478,14 @@
       </tr>
       <tr>
         <td>ICICIBANK</td>
+        <td class="td-chart">
+          <div class="tradingview-widget-container spark-cell">
+            <div class="tradingview-widget-container__widget" style="height:60px;width:160px"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+            {"symbol":"NSE:ICICIBANK","width":160,"height":60,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
+            </script>
+          </div>
+        </td>
         <td><span class="badge b-bull">Bull</span></td>
         <td><span class="badge b-bull">Bull</span></td>
         <td><span class="badge b-warn">Flat</span></td>
@@ -458,6 +495,14 @@
       </tr>
       <tr>
         <td>SUNPHARMA</td>
+        <td class="td-chart">
+          <div class="tradingview-widget-container spark-cell">
+            <div class="tradingview-widget-container__widget" style="height:60px;width:160px"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+            {"symbol":"NSE:SUNPHARMA","width":160,"height":60,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
+            </script>
+          </div>
+        </td>
         <td><span class="badge b-bull">Bull</span></td>
         <td><span class="badge b-bull">Bull</span></td>
         <td><span class="badge b-bull">BO</span></td>
@@ -467,6 +512,14 @@
       </tr>
       <tr>
         <td>MARUTI</td>
+        <td class="td-chart">
+          <div class="tradingview-widget-container spark-cell">
+            <div class="tradingview-widget-container__widget" style="height:60px;width:160px"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+            {"symbol":"NSE:MARUTI","width":160,"height":60,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
+            </script>
+          </div>
+        </td>
         <td><span class="badge b-bear">Bear</span></td>
         <td><span class="badge b-bear">Bear</span></td>
         <td><span class="badge b-warn">Flat</span></td>

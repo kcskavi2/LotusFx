@@ -5,109 +5,68 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LotusFx — Intraday Aerial View</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #0d0f14; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; font-size: 13px; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0d0f14; color:#e0e0e0; font-family:'Segoe UI',sans-serif; font-size:13px; }
 
-  #topbar {
-    background: #141720; border-bottom: 1px solid #222636;
-    padding: 6px 16px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-  }
-  #topbar .title { font-size: 13px; font-weight: 700; color: #7c9fff; margin-right: 10px; letter-spacing: .5px; }
-  .pulse-chip {
-    padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
-    display: inline-flex; align-items: center; gap: 5px;
-  }
-  .pulse-chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
-  .bull  { background: #0d2e1a; color: #34d399; border: 1px solid #1a5c38; }
-  .bear  { background: #2e0d0d; color: #f87171; border: 1px solid #5c1a1a; }
-  .neut  { background: #1e1e2e; color: #94a3b8; border: 1px solid #334155; }
-  .warn  { background: #2e1f0d; color: #fbbf24; border: 1px solid #78460d; }
-  #clock { margin-left: auto; font-size: 12px; color: #64748b; font-variant-numeric: tabular-nums; }
+#topbar { background:#141720; border-bottom:1px solid #222636; padding:6px 16px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.title { font-size:13px; font-weight:700; color:#7c9fff; margin-right:10px; letter-spacing:.5px; }
+.pulse-chip { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; display:inline-flex; align-items:center; gap:5px; }
+.pulse-chip::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; display:inline-block; }
+.bull  { background:#0d2e1a; color:#34d399; border:1px solid #1a5c38; }
+.bear  { background:#2e0d0d; color:#f87171; border:1px solid #5c1a1a; }
+.neut  { background:#1e1e2e; color:#94a3b8; border:1px solid #334155; }
+.warn  { background:#2e1f0d; color:#fbbf24; border:1px solid #78460d; }
+#clock { margin-left:auto; font-size:12px; color:#64748b; font-variant-numeric:tabular-nums; }
 
-  .section-label {
-    font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: #475569;
-    padding: 8px 14px 3px; text-transform: uppercase;
-  }
+.section-label { font-size:10px; font-weight:700; letter-spacing:1.2px; color:#475569; padding:8px 14px 3px; text-transform:uppercase; }
 
-  /* TIER 1 — full charts */
-  .tier1-row { display: flex; gap: 8px; padding: 4px 12px; }
-  .tier1-card {
-    flex: 1; height: 220px; background: #141720;
-    border: 1px solid #1e2436; border-radius: 8px; overflow: hidden;
-    display: flex; flex-direction: column;
-  }
-  .card-header {
-    padding: 5px 10px; background: #1a1f2e; border-bottom: 1px solid #1e2436;
-    display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-  }
-  .card-header .name { font-size: 12px; font-weight: 600; color: #cbd5e1; }
-  .card-header .meta { font-size: 10px; color: #475569; }
-  .card-body { flex: 1; overflow: hidden; }
+.tier1-row { display:flex; gap:8px; padding:4px 12px; }
+.tier1-card { flex:1; height:220px; background:#141720; border:1px solid #1e2436; border-radius:8px; overflow:hidden; display:flex; flex-direction:column; }
+.card-header { padding:5px 10px; background:#1a1f2e; border-bottom:1px solid #1e2436; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.card-header .name { font-size:12px; font-weight:600; color:#cbd5e1; }
+.card-header .meta { font-size:10px; color:#475569; }
+.card-body { flex:1; overflow:hidden; }
 
-  /* TIER 2 — sparkline cards */
-  .tier2-scroll {
-    display: flex; gap: 8px; padding: 4px 12px 6px;
-    overflow-x: auto; scrollbar-width: thin; scrollbar-color: #2a3040 transparent;
-  }
-  .spark-card {
-    flex-shrink: 0; width: 190px; height: 110px;
-    background: #141720; border: 1px solid #1e2436; border-radius: 8px;
-    overflow: hidden; display: flex; flex-direction: column;
-  }
-  .spark-card .card-header { padding: 4px 8px; }
-  .spark-body { flex: 1; overflow: hidden; }
+.tier2-scroll { display:flex; gap:8px; padding:4px 12px 6px; overflow-x:auto; scrollbar-width:thin; scrollbar-color:#2a3040 transparent; }
+.spark-card { flex-shrink:0; width:190px; height:110px; background:#141720; border:1px solid #1e2436; border-radius:8px; overflow:hidden; display:flex; flex-direction:column; }
+.spark-card .card-header { padding:4px 8px; }
+.spark-body { flex:1; overflow:hidden; }
 
-  /* TIER 3 — stock sparklines */
-  .tier3-scroll {
-    display: flex; gap: 8px; padding: 4px 12px 6px; flex-wrap: wrap;
-  }
-  .stock-card {
-    width: 170px; height: 130px;
-    background: #141720; border: 1px solid #1e2436; border-radius: 8px;
-    overflow: hidden; display: flex; flex-direction: column;
-  }
-  .stock-card .card-header { padding: 4px 8px; }
+.tier3-scroll { display:flex; gap:8px; padding:4px 12px 6px; flex-wrap:wrap; }
+.stock-card { width:170px; height:130px; background:#141720; border:1px solid #1e2436; border-radius:8px; overflow:hidden; display:flex; flex-direction:column; }
+.stock-card .card-header { padding:4px 8px; }
 
-  /* SIGNAL BAR */
-  .scanner-bar { display: flex; gap: 8px; padding: 4px 12px; flex-wrap: wrap; }
-  .signal-chip {
-    background: #141720; border: 1px solid #1e2436; border-radius: 8px;
-    padding: 7px 12px; flex: 1; min-width: 110px;
-  }
-  .signal-chip .sig-label { font-size: 10px; color: #475569; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; }
-  .signal-chip .sig-stocks { font-size: 11px; color: #94a3b8; margin-top: 2px; }
-  .signal-chip.active-sig { border-color: #1a5c38; }
-  .signal-chip.active-sig .sig-label { color: #34d399; }
-  .signal-chip.active-sig .sig-stocks { color: #6ee7b7; }
+.scanner-bar { display:flex; gap:8px; padding:4px 12px; flex-wrap:wrap; }
+.signal-chip { background:#141720; border:1px solid #1e2436; border-radius:8px; padding:7px 12px; flex:1; min-width:110px; }
+.signal-chip .sig-label { font-size:10px; color:#475569; font-weight:700; letter-spacing:.6px; text-transform:uppercase; }
+.signal-chip .sig-stocks { font-size:11px; color:#94a3b8; margin-top:2px; }
+.signal-chip.active-sig { border-color:#1a5c38; }
+.signal-chip.active-sig .sig-label { color:#34d399; }
+.signal-chip.active-sig .sig-stocks { color:#6ee7b7; }
 
-  /* MTF MATRIX */
-  .matrix-wrap { padding: 4px 12px 8px; overflow-x: auto; }
-  .matrix-table { width: 100%; border-collapse: collapse; background: #141720; border: 1px solid #1e2436; border-radius: 8px; overflow: hidden; min-width: 780px; }
-  .matrix-table th { background: #1a1f2e; padding: 6px 8px; font-size: 10px; font-weight: 700; letter-spacing: .8px; color: #475569; text-transform: uppercase; text-align: center; }
-  .matrix-table th:first-child { text-align: left; min-width: 90px; }
-  .matrix-table th.th-chart { min-width: 160px; }
-  .matrix-table td { padding: 4px 8px; text-align: center; border-top: 1px solid #1a1f2e; font-size: 11px; }
-  .matrix-table td:first-child { text-align: left; font-weight: 600; color: #cbd5e1; vertical-align: middle; }
-  .matrix-table td.td-chart { padding: 3px 6px; }
-  .matrix-table tr:hover td { background: #1a1f2e; }
-  .spark-cell { width: 160px; height: 60px; display: block; }
-  .badge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 700; }
-  .b-bull  { background: #0d2e1a; color: #34d399; }
-  .b-bear  { background: #2e0d0d; color: #f87171; }
-  .b-neut  { background: #1e2030; color: #94a3b8; }
-  .b-warn  { background: #2e1f0d; color: #fbbf24; }
-  .b-trade { background: #0a3020; color: #10b981; border: 1px solid #065f46; }
-  .b-watch { background: #2c1e08; color: #f59e0b; border: 1px solid #92400e; }
-  .b-skip  { background: #2c0a0a; color: #ef4444; border: 1px solid #991b1b; }
+.matrix-wrap { padding:4px 12px 8px; overflow-x:auto; }
+.matrix-table { border-collapse:collapse; background:#141720; border:1px solid #1e2436; border-radius:8px; overflow:hidden; min-width:900px; }
+.matrix-table th { background:#1a1f2e; padding:6px 10px; font-size:10px; font-weight:700; letter-spacing:.8px; color:#475569; text-transform:uppercase; text-align:center; white-space:nowrap; }
+.matrix-table th:first-child { text-align:left; width:90px; }
+.matrix-table td { padding:3px 8px; text-align:center; border-top:1px solid #1a1f2e; font-size:11px; vertical-align:middle; }
+.matrix-table td:first-child { text-align:left; font-weight:600; color:#cbd5e1; }
+.matrix-table tr:hover td { background:#1a1f2e; }
+.badge { display:inline-block; padding:2px 7px; border-radius:10px; font-size:10px; font-weight:700; }
+.b-bull  { background:#0d2e1a; color:#34d399; }
+.b-bear  { background:#2e0d0d; color:#f87171; }
+.b-neut  { background:#1e2030; color:#94a3b8; }
+.b-warn  { background:#2e1f0d; color:#fbbf24; }
+.b-trade { background:#0a3020; color:#10b981; border:1px solid #065f46; }
+.b-watch { background:#2c1e08; color:#f59e0b; border:1px solid #92400e; }
+.b-skip  { background:#2c0a0a; color:#ef4444; border:1px solid #991b1b; }
 
-  #footer { text-align: center; padding: 8px; font-size: 10px; color: #334155; border-top: 1px solid #1a1f2e; margin-top: 4px; }
-  ::-webkit-scrollbar { height: 4px; width: 4px; }
-  ::-webkit-scrollbar-thumb { background: #2a3040; border-radius: 4px; }
+#footer { text-align:center; padding:8px; font-size:10px; color:#334155; border-top:1px solid #1a1f2e; margin-top:4px; }
+::-webkit-scrollbar { height:4px; width:4px; }
+::-webkit-scrollbar-thumb { background:#2a3040; border-radius:4px; }
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div id="topbar">
   <span class="title">&#9670; LOTUSFX — INTRADAY AERIAL VIEW</span>
   <span class="pulse-chip bull">NIFTY BULL</span>
@@ -118,41 +77,41 @@
   <span id="clock">--:--:--</span>
 </div>
 
-<!-- TIER 1 — Nifty Indexes full charts -->
+<!-- TIER 1 -->
 <div class="section-label">Tier 1 — Nifty Indexes (Market Direction · H1)</div>
 <div class="tier1-row">
 
   <div class="tier1-card">
-    <div class="card-header"><span class="name">Nifty 50</span><span class="meta">NSE:NIFTY · H1</span></div>
+    <div class="card-header"><span class="name">Nifty 50</span><span class="meta">CAPITALCOM:IN50 · H1</span></div>
     <div class="card-body">
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-        {"symbol":"NSE:NIFTY","interval":"60","timezone":"Asia/Kolkata","theme":"dark","style":"1","locale":"en","toolbar_bg":"#141720","enable_publishing":false,"withdateranges":false,"hide_side_toolbar":true,"allow_symbol_change":false,"save_image":false,"studies":["MAExp@tv-basicstudies","Volume@tv-basicstudies"],"height":"100%","width":"100%"}
+        {"symbol":"CAPITALCOM:IN50","interval":"60","timezone":"Asia/Kolkata","theme":"dark","style":"1","locale":"en","toolbar_bg":"#141720","enable_publishing":false,"withdateranges":false,"hide_side_toolbar":true,"allow_symbol_change":false,"save_image":false,"studies":["MAExp@tv-basicstudies","Volume@tv-basicstudies"],"height":"100%","width":"100%"}
         </script>
       </div>
     </div>
   </div>
 
   <div class="tier1-card">
-    <div class="card-header"><span class="name">Bank Nifty</span><span class="meta">NSE:BANKNIFTY · H1</span></div>
+    <div class="card-header"><span class="name">Bank Nifty</span><span class="meta">BSE:BANKEX · H1</span></div>
     <div class="card-body">
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-        {"symbol":"NSE:BANKNIFTY","interval":"60","timezone":"Asia/Kolkata","theme":"dark","style":"1","locale":"en","toolbar_bg":"#141720","enable_publishing":false,"withdateranges":false,"hide_side_toolbar":true,"allow_symbol_change":false,"save_image":false,"studies":["MAExp@tv-basicstudies","Volume@tv-basicstudies"],"height":"100%","width":"100%"}
+        {"symbol":"BSE:BANKEX","interval":"60","timezone":"Asia/Kolkata","theme":"dark","style":"1","locale":"en","toolbar_bg":"#141720","enable_publishing":false,"withdateranges":false,"hide_side_toolbar":true,"allow_symbol_change":false,"save_image":false,"studies":["MAExp@tv-basicstudies","Volume@tv-basicstudies"],"height":"100%","width":"100%"}
         </script>
       </div>
     </div>
   </div>
 
   <div class="tier1-card">
-    <div class="card-header"><span class="name">Fin Nifty</span><span class="meta">NSE:FINNIFTY · H1</span></div>
+    <div class="card-header"><span class="name">Sensex</span><span class="meta">BSE:SENSEX · H1</span></div>
     <div class="card-body">
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-        {"symbol":"NSE:FINNIFTY","interval":"60","timezone":"Asia/Kolkata","theme":"dark","style":"1","locale":"en","toolbar_bg":"#141720","enable_publishing":false,"withdateranges":false,"hide_side_toolbar":true,"allow_symbol_change":false,"save_image":false,"studies":["MAExp@tv-basicstudies"],"height":"100%","width":"100%"}
+        {"symbol":"BSE:SENSEX","interval":"60","timezone":"Asia/Kolkata","theme":"dark","style":"1","locale":"en","toolbar_bg":"#141720","enable_publishing":false,"withdateranges":false,"hide_side_toolbar":true,"allow_symbol_change":false,"save_image":false,"studies":["MAExp@tv-basicstudies"],"height":"100%","width":"100%"}
         </script>
       </div>
     </div>
@@ -160,101 +119,101 @@
 
 </div>
 
-<!-- TIER 2 — Sector Indexes SPARKLINE -->
-<div class="section-label">Tier 2 — Sector Indexes (Sparkline · 15m)</div>
+<!-- TIER 2 -->
+<div class="section-label">Tier 2 — Sector Indexes (Sparkline · Today)</div>
 <div class="tier2-scroll">
 
   <div class="spark-card">
-    <div class="card-header"><span class="name">Nifty IT</span><span class="meta">15m</span></div>
+    <div class="card-header"><span class="name">IT</span><span class="meta">BSE:IT</span></div>
     <div class="spark-body">
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:IT","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:IT","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
   </div>
 
   <div class="spark-card">
-    <div class="card-header"><span class="name">Nifty Bank</span><span class="meta">15m</span></div>
+    <div class="card-header"><span class="name">Bankex</span><span class="meta">BSE:BANKEX</span></div>
     <div class="spark-body">
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"NSE:BANKNIFTY","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:BANKEX","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
   </div>
 
   <div class="spark-card">
-    <div class="card-header"><span class="name">Nifty Pharma</span><span class="meta">15m</span></div>
+    <div class="card-header"><span class="name">Healthcare</span><span class="meta">BSE:HEALTHCARE</span></div>
     <div class="spark-body">
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:HEALTHCARE","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:HEALTHCARE","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
   </div>
 
   <div class="spark-card">
-    <div class="card-header"><span class="name">Nifty Auto</span><span class="meta">15m</span></div>
+    <div class="card-header"><span class="name">Auto</span><span class="meta">BSE:AUTO</span></div>
     <div class="spark-body">
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:AUTO","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:AUTO","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
   </div>
 
   <div class="spark-card">
-    <div class="card-header"><span class="name">Nifty FMCG</span><span class="meta">15m</span></div>
+    <div class="card-header"><span class="name">FMCG</span><span class="meta">BSE:FMCG</span></div>
     <div class="spark-body">
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:FMCG","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:FMCG","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
   </div>
 
   <div class="spark-card">
-    <div class="card-header"><span class="name">Nifty Metal</span><span class="meta">15m</span></div>
+    <div class="card-header"><span class="name">Metal</span><span class="meta">BSE:METAL</span></div>
     <div class="spark-body">
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:METAL","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:METAL","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
   </div>
 
   <div class="spark-card">
-    <div class="card-header"><span class="name">Nifty Realty</span><span class="meta">15m</span></div>
+    <div class="card-header"><span class="name">Realty</span><span class="meta">BSE:REALTY</span></div>
     <div class="spark-body">
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:REALTY","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:REALTY","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
   </div>
 
   <div class="spark-card">
-    <div class="card-header"><span class="name">Nifty Energy</span><span class="meta">15m</span></div>
+    <div class="card-header"><span class="name">Energy</span><span class="meta">BSE:ENERGY</span></div>
     <div class="spark-body">
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"BSE:ENERGY","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:ENERGY","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
@@ -262,8 +221,8 @@
 
 </div>
 
-<!-- TIER 3 — Sector Stocks sparklines -->
-<div class="section-label">Tier 3 — Sector Stocks (Sparkline · 15m)</div>
+<!-- TIER 3 -->
+<div class="section-label">Tier 3 — Sector Stocks (Sparkline · Today)</div>
 <div class="tier3-scroll">
 
   <div class="stock-card">
@@ -272,7 +231,7 @@
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"NSE:TCS","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:TCS","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
@@ -284,7 +243,7 @@
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"NSE:INFY","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:INFY","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
@@ -296,7 +255,7 @@
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"NSE:WIPRO","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:WIPRO","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
@@ -308,7 +267,7 @@
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"NSE:HDFCBANK","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:HDFCBANK","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
@@ -320,7 +279,7 @@
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"NSE:ICICIBANK","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:ICICIBANK","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
@@ -332,7 +291,7 @@
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"NSE:AXISBANK","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:AXISBANK","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
@@ -344,19 +303,7 @@
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"NSE:SUNPHARMA","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
-        </script>
-      </div>
-    </div>
-  </div>
-
-  <div class="stock-card">
-    <div class="card-header"><span class="name">Dr Reddy</span><span class="meta">Pharma</span></div>
-    <div class="spark-body">
-      <div class="tradingview-widget-container" style="height:100%;width:100%">
-        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"NSE:DRREDDY","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:SUNPHARMA","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
@@ -368,7 +315,7 @@
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"NSE:MARUTI","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:MARUTI","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
@@ -380,7 +327,7 @@
       <div class="tradingview-widget-container" style="height:100%;width:100%">
         <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"NSE:TATAMOTORS","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":""}
+        {"symbol":"BSE:TATAMOTORS","width":"100%","height":"100%","locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":true}
         </script>
       </div>
     </div>
@@ -413,25 +360,26 @@
   </div>
 </div>
 
-<!-- MTF MATRIX -->
+<!-- MTF MATRIX with sparkline per row -->
 <div class="section-label" style="margin-top:6px">MTF Confirmation Matrix — Trade / Watch / Skip</div>
 <div class="matrix-wrap">
   <table class="matrix-table">
     <thead>
       <tr>
         <th>Stock</th>
-        <th class="th-chart">Intraday Chart</th>
+        <th style="width:185px">Intraday Chart</th>
         <th>D1</th><th>H1</th><th>15m</th><th>5m</th><th>Signal</th><th>Action</th>
       </tr>
     </thead>
     <tbody>
+
       <tr>
         <td>TCS</td>
-        <td class="td-chart">
-          <div class="tradingview-widget-container spark-cell">
-            <div class="tradingview-widget-container__widget" style="height:60px;width:160px"></div>
+        <td style="padding:2px 4px">
+          <div class="tradingview-widget-container" style="height:58px;width:178px">
+            <div class="tradingview-widget-container__widget" style="height:58px;width:178px"></div>
             <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-            {"symbol":"NSE:TCS","width":160,"height":60,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
+            {"symbol":"BSE:TCS","width":178,"height":58,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false}
             </script>
           </div>
         </td>
@@ -442,13 +390,14 @@
         <td><span class="badge b-bull">Breakout</span></td>
         <td><span class="badge b-trade">TRADE</span></td>
       </tr>
+
       <tr>
         <td>INFY</td>
-        <td class="td-chart">
-          <div class="tradingview-widget-container spark-cell">
-            <div class="tradingview-widget-container__widget" style="height:60px;width:160px"></div>
+        <td style="padding:2px 4px">
+          <div class="tradingview-widget-container" style="height:58px;width:178px">
+            <div class="tradingview-widget-container__widget" style="height:58px;width:178px"></div>
             <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-            {"symbol":"NSE:INFY","width":160,"height":60,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
+            {"symbol":"BSE:INFY","width":178,"height":58,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false}
             </script>
           </div>
         </td>
@@ -459,13 +408,14 @@
         <td><span class="badge b-bull">Momentum</span></td>
         <td><span class="badge b-trade">TRADE</span></td>
       </tr>
+
       <tr>
         <td>HDFCBANK</td>
-        <td class="td-chart">
-          <div class="tradingview-widget-container spark-cell">
-            <div class="tradingview-widget-container__widget" style="height:60px;width:160px"></div>
+        <td style="padding:2px 4px">
+          <div class="tradingview-widget-container" style="height:58px;width:178px">
+            <div class="tradingview-widget-container__widget" style="height:58px;width:178px"></div>
             <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-            {"symbol":"NSE:HDFCBANK","width":160,"height":60,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
+            {"symbol":"BSE:HDFCBANK","width":178,"height":58,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false}
             </script>
           </div>
         </td>
@@ -476,13 +426,14 @@
         <td><span class="badge b-warn">Vol Spike</span></td>
         <td><span class="badge b-watch">WATCH</span></td>
       </tr>
+
       <tr>
         <td>ICICIBANK</td>
-        <td class="td-chart">
-          <div class="tradingview-widget-container spark-cell">
-            <div class="tradingview-widget-container__widget" style="height:60px;width:160px"></div>
+        <td style="padding:2px 4px">
+          <div class="tradingview-widget-container" style="height:58px;width:178px">
+            <div class="tradingview-widget-container__widget" style="height:58px;width:178px"></div>
             <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-            {"symbol":"NSE:ICICIBANK","width":160,"height":60,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
+            {"symbol":"BSE:ICICIBANK","width":178,"height":58,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false}
             </script>
           </div>
         </td>
@@ -493,13 +444,14 @@
         <td><span class="badge b-warn">Wait</span></td>
         <td><span class="badge b-watch">WATCH</span></td>
       </tr>
+
       <tr>
         <td>SUNPHARMA</td>
-        <td class="td-chart">
-          <div class="tradingview-widget-container spark-cell">
-            <div class="tradingview-widget-container__widget" style="height:60px;width:160px"></div>
+        <td style="padding:2px 4px">
+          <div class="tradingview-widget-container" style="height:58px;width:178px">
+            <div class="tradingview-widget-container__widget" style="height:58px;width:178px"></div>
             <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-            {"symbol":"NSE:SUNPHARMA","width":160,"height":60,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
+            {"symbol":"BSE:SUNPHARMA","width":178,"height":58,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false}
             </script>
           </div>
         </td>
@@ -510,13 +462,14 @@
         <td><span class="badge b-bull">Breakout</span></td>
         <td><span class="badge b-trade">TRADE</span></td>
       </tr>
+
       <tr>
         <td>MARUTI</td>
-        <td class="td-chart">
-          <div class="tradingview-widget-container spark-cell">
-            <div class="tradingview-widget-container__widget" style="height:60px;width:160px"></div>
+        <td style="padding:2px 4px">
+          <div class="tradingview-widget-container" style="height:58px;width:178px">
+            <div class="tradingview-widget-container__widget" style="height:58px;width:178px"></div>
             <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-            {"symbol":"NSE:MARUTI","width":160,"height":60,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
+            {"symbol":"BSE:MARUTI","width":178,"height":58,"locale":"en","dateRange":"1D","colorTheme":"dark","isTransparent":true,"autosize":false}
             </script>
           </div>
         </td>
@@ -527,12 +480,13 @@
         <td><span class="badge b-bear">No setup</span></td>
         <td><span class="badge b-skip">SKIP</span></td>
       </tr>
+
     </tbody>
   </table>
-  <div style="font-size:11px;color:#475569;margin-top:5px">Rule: D1 + H1 రెండూ Bull అయినప్పుడే entry consider చేయండి. ఒక్కటి Bear అయినా — SKIP.</div>
+  <div style="font-size:11px;color:#475569;margin-top:5px">Rule: D1 + H1 రెండూ Bull అయినప్పుడే entry చేయండి. ఒక్కటి Bear అయినా — SKIP.</div>
 </div>
 
-<div id="footer">LotusFx Intraday Aerial View &nbsp;|&nbsp; Live charts: TradingView &nbsp;|&nbsp; Built for personal use — not financial advice</div>
+<div id="footer">LotusFx Intraday Aerial View &nbsp;|&nbsp; Live charts: TradingView (BSE) &nbsp;|&nbsp; Built for personal use — not financial advice</div>
 
 <script>
 function tick() {
